@@ -246,8 +246,11 @@ app.post("/login", async (req, res) => {
     const token = jwt.sign({ email, role: "student" }, "Aashish", { expiresIn: "1h" });
     res.cookie("token", token, { 
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'
+      httpOnly: true,
+  secure: true,
+  sameSite: 'none',
+  maxAge: 3600000
+    
     });
 
     res.status(200).json({ message: "Login successful", user, role: "student" });
@@ -424,3 +427,4 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
