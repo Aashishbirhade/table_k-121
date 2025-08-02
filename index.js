@@ -150,7 +150,6 @@ const cors = require("cors");
 app.use(cors({ 
   origin: ["http://localhost:3001", "http://localhost:5173"], 
   credentials: true,
-  
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -204,8 +203,9 @@ app.post("/register", async (req, res) => {
     const token = jwt.sign({ email, role: "student" }, "Aashish", { expiresIn: "1h" });
     res.cookie("token", token, { 
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'
+      secure: true,      // Required for HTTPS
+      sameSite: "none",  // Required for cross-site cookies
+      maxAge: 3600000, 
     });
 
     res.status(201).json({ message: "Student registered successfully", user });
@@ -225,9 +225,10 @@ app.post("/login", async (req, res) => {
       if (password === FACULTY_PASSWORD) {
         const token = jwt.sign({ email, role: "faculty" }, "Aashish", { expiresIn: "1h" });
         res.cookie("token", token, { 
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: process.env.NODE_ENV === 'production'
+           httpOnly: true,
+      secure: true,      // Required for HTTPS
+      sameSite: "none",  // Required for cross-site cookies
+      maxAge: 3600000, 
         });
         return res.status(200).json({ message: "Faculty login successful", role: "faculty" });
       } else {
@@ -409,7 +410,7 @@ app.post("/logout", (req, res) => {
     expires: new Date(0),
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production'
+   
   });
   res.status(200).json({ message: "Logged out successfully" });
 });
@@ -421,4 +422,5 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
